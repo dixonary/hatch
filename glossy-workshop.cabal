@@ -10,7 +10,8 @@ copyright:           2018 Alex Dixon
 category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
-extra-source-files:
+data-files:          *.png
+data-dir:            assets
 
 executable glossy-workshop
   hs-source-dirs:      src

@@ -6,6 +6,8 @@ import Graphics.Gloss hiding (red, rotate, animate, translate)
 import Graphics.Gloss.Game (png)
 import qualified Graphics.Gloss as G (red, rotate, animate, translate)
 import Debug.Trace
+import System.IO.Unsafe
+import Paths_glossy_workshop
 
 {-------------------------------------------------------------------------------
                                   Data Types
@@ -47,7 +49,7 @@ a <|> b = Horz a b
 a <-> b = Vert a b
 
 cat :: Image
-cat = Leaf $ png "cat.png"
+cat = Leaf $ png $ unsafePerformIO $ getDataFileName "cat.png"
 
 layout :: Image -> Picture
 layout (Vert a b) = pictures $ let
