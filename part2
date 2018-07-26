@@ -1,0 +1,2 @@
+#!/bin/bash
+stack build hatch:part2 && stack exec part2
