@@ -1,0 +1,2 @@
+cmd: ./build.sh {FILE_ACTIVE}
+name: Run code
