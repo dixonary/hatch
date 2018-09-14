@@ -40,17 +40,37 @@ imgW = 200
 imgH :: Int
 imgH = 125
 
+type Size = (Int, Int)
+
+width :: Size -> Int
+width = fst
+
+height :: Size -> Int
+height = snd
+
+-- | `size` @img calculates the size of @img
+size :: Image -> Size
+size (Leaf _) = (imgW, imgH)
+size (Vert i j) = (max iW jW, iH+jH)
+    where (iW,iH) = size i
+          (jW,jH) = size j
+size (Horz i j) = (iW+jW, max iH jH)
+    where (iW,iH) = size i
+          (jW,jH) = size j
+size (Supp i j) = (max iW jW, max iH jH)
+    where (iW,iH) = size i
+          (jW,jH) = size j
 
 -- Convert from Images to Gloss's picture format
 layout :: Image -> Picture
 layout (Vert a b) = pictures $ let
-        tb = translate 0 (fromIntegral imgH) $ layout b
+        tb = translate 0 (fromIntegral (height $ size a)) $ layout b
         ta = case layout a of
             Pictures ps -> ps
             xs -> [xs]
     in tb : ta
 layout (Horz a b) = pictures $ let
-        tb = translate (fromIntegral imgW) 0 $ layout b
+        tb = translate (fromIntegral (width $ size a)) 0 $ layout b
         ta = case layout a of
             Pictures ps -> ps
             xs -> [xs]
