@@ -15,7 +15,7 @@ fps :: Int
 fps = 30
 
 runPart1 :: Image -> IO ()
-runPart1 drawing = display window background $ layout drawing
+runPart1 drawing = display window background $ render $ layout drawing
 
 runPart2 :: (Int -> Image) -> IO ()
 runPart2 = animSteps fps
@@ -28,7 +28,7 @@ background :: Color
 background = white
 
 animSteps :: Int -> (Int -> Image) -> IO ()
-animSteps steps animFunc = animate window background (layout . animFunc . tStep)
+animSteps steps animFunc = animate window background (render . layout . animFunc . tStep)
     where
         tStep :: Float -> Int
         tStep t = ceiling (t/framePeriod)

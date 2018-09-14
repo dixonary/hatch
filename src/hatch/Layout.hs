@@ -40,25 +40,46 @@ imgW = 200
 imgH :: Int
 imgH = 125
 
+type Size = (Int, Int)
+type Pos = (Int, Int)
+
+width :: Image -> Int
+width = fst . size
+
+height :: Image -> Int
+height = snd . size
+
+left :: Pos -> Int
+left = fst
+
+top :: Pos -> Int
+top = snd
+
+-- | `size` @img calculates the size of @img
+size :: Image -> Size
+size (Leaf _) = (imgW, imgH)
+size (Vert i j) = (max iW jW, iH+jH)
+    where (iW,iH) = size i
+          (jW,jH) = size j
+size (Horz i j) = (iW+jW, max iH jH)
+    where (iW,iH) = size i
+          (jW,jH) = size j
+size (Supp i j) = (max iW jW, max iH jH)
+    where (iW,iH) = size i
+          (jW,jH) = size j
 
 -- Convert from Images to Gloss's picture format
-layout :: Image -> Picture
-layout (Vert a b) = pictures $ let
-        tb = translate 0 (fromIntegral imgH) $ layout b
-        ta = case layout a of
-            Pictures ps -> ps
-            xs -> [xs]
-    in tb : ta
-layout (Horz a b) = pictures $ let
-        tb = translate (fromIntegral imgW) 0 $ layout b
-        ta = case layout a of
-            Pictures ps -> ps
-            xs -> [xs]
-    in tb : ta
-layout (Supp a b) = pictures $ let
-        tb = layout b
-        ta = case layout a of
-            Pictures ps -> ps
-            xs -> [xs]
-    in tb : ta
-layout (Leaf p  ) = p
+layout :: Image -> [(Pos, Picture)]
+layout (Vert a b) =
+    let tb = map (\((x,y), i) -> ((x, y - height a), i)) (layout b)
+    in (layout a) ++ tb
+layout (Horz a b) =
+    let tb = map (\((x,y), i) -> ((x + width a, y), i)) (layout b)
+    in layout a ++ tb
+layout (Supp a b) = layout a ++ layout b
+layout (Leaf p  ) = [((0,0), p)]
+
+-- | `render` @pps translates pictures in @pps by their absolute
+-- position and combines them into one picture.
+render :: [(Pos, Picture)] -> Picture
+render = pictures . map (\(p,i) -> translate (fromIntegral $ left p) (fromIntegral $ top p) i)
